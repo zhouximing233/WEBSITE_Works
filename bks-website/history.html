@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>创建历史 - BKS官方网站</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* 历史页面特定样式 */
+        .history-container {
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 40px;
+            background: var(--bg-light);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-medium);
+        }
+
+        .history-header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            border-bottom: 3px solid var(--primary-color);
+        }
+
+        .history-header h1 {
+            font-size: 2.5rem;
+            color: var(--dark-text);
+            margin-bottom: 10px;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 700;
+        }
+
+        .history-timeline {
+            position: relative;
+            padding-left: 30px;
+        }
+
+        .history-timeline::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: var(--primary-gradient);
+            border-radius: 2px;
+        }
+
+        .timeline-item {
+            position: relative;
+            margin-bottom: 40px;
+            padding: 20px;
+            background: white;
+            border-radius: var(--border-radius-sm);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -40px;
+            top: 25px;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--secondary-color);
+            border: 3px solid white;
+            box-shadow: 0 0 0 4px var(--secondary-color);
+        }
+
+        .timeline-date {
+            color: var(--primary-color);
+            font-weight: bold;
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+        }
+
+        .timeline-content h3 {
+            color: var(--dark-text);
+            margin-bottom: 10px;
+            font-size: 1.3rem;
+        }
+
+        .timeline-content p {
+            color: var(--light-text);
+            line-height: 1.8;
+        }
+
+        .back-home {
+            display: inline-block;
+            margin-top: 30px;
+            padding: 12px 25px;
+            background: var(--primary-gradient);
+            color: white;
+            text-decoration: none;
+            border-radius: 25px;
+            font-weight: 600;
+            transition: all var(--transition-speed) ease;
+            border: none;
+            cursor: pointer;
+        }
+
+        .back-home:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .quote {
+            font-style: italic;
+            color: var(--secondary-color);
+            border-left: 4px solid var(--secondary-color);
+            padding-left: 20px;
+            margin: 30px 0;
+            font-size: 1.1rem;
+            background: rgba(118, 75, 162, 0.05);
+            padding: 15px 20px;
+            border-radius: 0 var(--border-radius-sm) var(--border-radius-sm) 0;
+        }
+
+        @media (max-width: 768px) {
+            .history-container {
+                margin: 30px auto;
+                padding: 25px;
+            }
+            
+            .history-header h1 {
+                font-size: 2rem;
+            }
+            
+            .timeline-item {
+                padding: 15px;
+            }
+            
+            .timeline-item::before {
+                left: -35px;
+                top: 20px;
+                width: 16px;
+                height: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <div class="logo">
+                <img src="images/logo.png" alt="BKS Logo">
+                <h1>BKS官方网站</h1>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="history-container">
+            <div class="history-header">
+                <h1><i class="fas fa-history"></i> BKS创建历史</h1>
+                <p>一段充满创意与热情的发展历程</p>
+            </div>
+
+            <div class="history-timeline">
+                <div class="timeline-item">
+                    <div class="timeline-date">2024年10月</div>
+                    <div class="timeline-content">
+                        <h3>项目构思</h3>
+                        <p>BKS项目的最初想法诞生于一个深夜，pz666233想要仿照初中他研制的尔邦杀玩法建立贝壳杀。</p>
+                    </div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-date">2025年5月</div>
+                    <div class="timeline-content">
+                        <h3>第一个角色设计</h3>
+                        <p>pz与高嘉、吕金泰完成了第一个角色"龙禹臣"的概念设计，这标志着BKS正式进入开发阶段。</p>
+                    </div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-date">2025年6月</div>
+                    <div class="timeline-content">
+                        <h3>世界观完善</h3>
+                        <p>完成了BKS的基础玩法、人物角色的设计。成功设计了22个基础角色，每个角色都有完整的背景故事和视觉设计。</p>
+                    </div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-date">2025年8月</div>
+                    <div class="timeline-content">
+                        <h3>V1.0内测</h3>
+                        <p>下单印刷纸质牌并进入第一轮内测。</p>
+                    </div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-date">2025年11月</div>
+                    <div class="timeline-content">
+                        <h3>V2.0上线</h3>
+                        <p>经过一轮内测，发现了众多bug并进行修复。再加上引入其余角色，构建了41个角色的BKS世界。</p>
+                    </div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-date">2026年1月</div>
+                    <div class="timeline-content">
+                        <h3>官方网站上线</h3>
+                        <p>pz与周熙明建立官方网站，让更多人可以了解和探索BKS的精彩世界。</p>
+                    </div>
+                </div>
+
+                <blockquote class="quote">
+                    "每个角色都是一个故事，每段故事都值得被讲述。BKS的世界因创意而生，为想象而存。"
+                </blockquote>
+
+                <p style="color: var(--light-text); line-height: 1.8;">
+                    在未来的日子里，BKS项目将继续扩展和完善。我们计划引入更多角色，开发互动故事，甚至制作相关衍生作品。感谢每一位关注者的支持，是你们的热情让这个世界更加完整。
+                </p>
+
+                <a href="index.html" class="back-home">
+                    <i class="fas fa-home"></i> 返回首页
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>© 2024 BKS官方网站 版权所有</p>
+    </footer>
+</body>
+</html>
