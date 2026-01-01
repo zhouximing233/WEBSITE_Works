@@ -1,0 +1,976 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>1V1人机对战 - BKS官方网站</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* 人机对战修正版样式 */
+        :root {
+            --attack-color: #e53e3e;
+            --defense-color: #3182ce;
+            --special-color: #805ad5;
+            --energy-color: #38a169;
+        }
+
+        .ai-battle-container {
+            max-width: 1400px;
+            margin: 20px auto;
+            padding: 20px;
+        }
+
+        .battle-header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 3px solid var(--primary-color);
+        }
+
+        .battle-header h1 {
+            font-size: 2.5rem;
+            color: white;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .battle-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .player-area, .ai-area {
+            background: var(--bg-light);
+            border-radius: var(--border-radius);
+            padding: 25px;
+            box-shadow: var(--shadow-light);
+            position: relative;
+        }
+
+        .turn-highlight {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: var(--primary-color);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 15px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            animation: pulse 2s infinite;
+            box-shadow: 0 3px 10px rgba(102, 126, 234, 0.3);
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        .character-display {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .character-avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid var(--primary-color);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .character-info {
+            flex-grow: 1;
+        }
+
+        .character-name {
+            font-size: 1.8rem;
+            color: var(--dark-text);
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .character-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .character-tag {
+            background: rgba(102, 126, 234, 0.1);
+            color: var(--primary-color);
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .stats-display {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .stat-box {
+            background: white;
+            border-radius: var(--border-radius-sm);
+            padding: 15px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+        }
+
+        .stat-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .stat-header i {
+            font-size: 1.2rem;
+        }
+
+        .hp-stat i {
+            color: #e53e3e;
+        }
+
+        .energy-stat i {
+            color: #38a169;
+        }
+
+        .stat-header h4 {
+            font-size: 1.1rem;
+            color: var(--dark-text);
+            font-weight: 600;
+            margin: 0;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--dark-text);
+            text-align: center;
+        }
+
+        .stat-bar {
+            height: 10px;
+            background: #e2e8f0;
+            border-radius: 5px;
+            margin-top: 10px;
+            overflow: hidden;
+        }
+
+        .hp-bar .fill {
+            height: 100%;
+            background: linear-gradient(90deg, #e53e3e, #fc8181);
+            border-radius: 5px;
+            transition: width 0.5s ease;
+        }
+
+        .energy-bar .fill {
+            height: 100%;
+            background: linear-gradient(90deg, #38a169, #68d391);
+            border-radius: 5px;
+            transition: width 0.5s ease;
+        }
+
+        .action-selection {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 2px solid #e2e8f0;
+        }
+
+        .action-selection h3 {
+            color: var(--dark-text);
+            font-size: 1.3rem;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .action-selection h3 i {
+            color: var(--primary-color);
+        }
+
+        .selected-action-display {
+            background: white;
+            border-radius: var(--border-radius-sm);
+            padding: 15px;
+            margin-bottom: 15px;
+            text-align: center;
+            border: 2px dashed #cbd5e0;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .selected-action {
+            font-size: 1.2rem;
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+
+        .waiting-selection {
+            color: #a0aec0;
+            font-style: italic;
+        }
+
+        /* 行动网格 - 重新设计 */
+        .actions-grid-v2 {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 12px;
+        }
+
+        @media (max-width: 1200px) {
+            .actions-grid-v2 {
+                grid-template-columns: repeat(5, 1fr);
+            }
+        }
+
+        @media (max-width: 992px) {
+            .actions-grid-v2 {
+                grid-template-columns: repeat(5, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .actions-grid-v2 {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        @media (max-width: 576px) {
+            .actions-grid-v2 {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        .action-btn-v2 {
+            background: white;
+            border: 2px solid #e2e8f0;
+            border-radius: var(--border-radius-sm);
+            padding: 15px 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+            min-height: 90px;
+            justify-content: center;
+        }
+
+        .action-btn-v2:hover:not(.disabled) {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .action-btn-v2.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .action-btn-v2.attack {
+            border-color: var(--attack-color);
+            background: rgba(229, 62, 62, 0.05);
+        }
+
+        .action-btn-v2.defense {
+            border-color: var(--defense-color);
+            background: rgba(49, 130, 206, 0.05);
+        }
+
+        .action-btn-v2.special {
+            border-color: var(--special-color);
+            background: rgba(128, 90, 213, 0.05);
+        }
+
+        .action-btn-v2.selected {
+            background: var(--primary-gradient);
+            color: white;
+            border-color: transparent;
+        }
+
+        .action-btn-v2.selected .action-cost {
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .action-btn-v2.selected .action-name {
+            color: white;
+        }
+
+        .action-number {
+            position: absolute;
+            top: 5px;
+            left: 5px;
+            background: rgba(0, 0, 0, 0.1);
+            color: var(--dark-text);
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .action-btn-v2.selected .action-number {
+            background: rgba(255, 255, 255, 0.3);
+            color: white;
+        }
+
+        .action-name {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--dark-text);
+            text-align: center;
+            margin-bottom: 5px;
+        }
+
+        .action-cost {
+            font-size: 0.9rem;
+            color: var(--light-text);
+            font-weight: 500;
+        }
+
+        .action-description {
+            font-size: 0.8rem;
+            color: var(--light-text);
+            text-align: center;
+            margin-top: 5px;
+        }
+
+        .battle-center {
+            grid-column: 1 / -1;
+            background: var(--bg-light);
+            border-radius: var(--border-radius);
+            padding: 25px;
+            margin-top: 20px;
+            box-shadow: var(--shadow-light);
+        }
+
+        .current-turn-info {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .current-turn-info h2 {
+            color: var(--dark-text);
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+        }
+
+        .current-turn-info p {
+            color: var(--light-text);
+            font-size: 1.1rem;
+        }
+
+        .turn-rules {
+            background: #f7fafc;
+            border-radius: var(--border-radius-sm);
+            padding: 20px;
+            margin-top: 15px;
+        }
+
+        .turn-rules h4 {
+            color: var(--dark-text);
+            margin-bottom: 10px;
+            font-size: 1.2rem;
+        }
+
+        .turn-rules p {
+            color: var(--dark-text);
+            line-height: 1.6;
+            margin-bottom: 8px;
+        }
+
+        .battle-controls {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .control-btn {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 25px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            min-width: 180px;
+            justify-content: center;
+        }
+
+        .confirm-btn {
+            background: var(--primary-gradient);
+            color: white;
+        }
+
+        .confirm-btn:hover:not(:disabled) {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .confirm-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .restart-btn {
+            background: #38a169;
+            color: white;
+        }
+
+        .restart-btn:hover {
+            background: #2f855a;
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(56, 161, 105, 0.3);
+        }
+
+        .back-btn {
+            background: #718096;
+            color: white;
+        }
+
+        .back-btn:hover {
+            background: #4a5568;
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(113, 128, 150, 0.3);
+        }
+
+        .battle-log {
+            background: var(--bg-light);
+            border-radius: var(--border-radius);
+            padding: 25px;
+            margin-top: 30px;
+            box-shadow: var(--shadow-light);
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .battle-log h3 {
+            color: var(--dark-text);
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+            font-weight: 600;
+        }
+
+        .log-messages {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .log-message {
+            padding: 10px 15px;
+            background: white;
+            border-radius: var(--border-radius-sm);
+            font-size: 0.95rem;
+            line-height: 1.5;
+            border-left: 4px solid #e2e8f0;
+        }
+
+        .log-message.player {
+            border-left-color: var(--primary-color);
+            background: rgba(102, 126, 234, 0.05);
+        }
+
+        .log-message.ai {
+            border-left-color: var(--attack-color);
+            background: rgba(229, 62, 62, 0.05);
+        }
+
+        .log-message.system {
+            border-left-color: #38a169;
+            background: rgba(56, 161, 105, 0.05);
+        }
+
+        /* 角色选择界面 */
+        .character-selection {
+            background: var(--bg-light);
+            border-radius: var(--border-radius);
+            padding: 30px;
+            margin: 30px auto;
+            max-width: 1000px;
+            box-shadow: var(--shadow-light);
+        }
+
+        .selection-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .selection-header h2 {
+            color: var(--dark-text);
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        .selection-header p {
+            color: var(--light-text);
+            font-size: 1.1rem;
+        }
+
+        .selection-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .character-option {
+            background: white;
+            border: 3px solid #e2e8f0;
+            border-radius: var(--border-radius-sm);
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            position: relative;
+        }
+
+        .character-option:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            border-color: var(--primary-color);
+        }
+
+        .character-option.selected {
+            border-color: var(--primary-color);
+            background: rgba(102, 126, 234, 0.05);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.2);
+        }
+
+        .character-option img {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 50%;
+            margin-bottom: 15px;
+            border: 3px solid var(--primary-color);
+        }
+
+        .character-option h3 {
+            color: var(--dark-text);
+            font-size: 1.3rem;
+            margin-bottom: 10px;
+        }
+
+        .character-option .tags {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 5px;
+            margin-bottom: 10px;
+        }
+
+        .character-option .tag {
+            background: rgba(102, 126, 234, 0.1);
+            color: var(--primary-color);
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .start-battle-btn {
+            display: block;
+            width: 200px;
+            margin: 30px auto;
+            padding: 15px 30px;
+            background: var(--primary-gradient);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .start-battle-btn:hover:not(:disabled) {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 30px rgba(102, 126, 234, 0.3);
+        }
+
+        .start-battle-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* 结果弹窗 */
+        .result-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 3000;
+            padding: 20px;
+        }
+
+        .result-modal.show {
+            display: flex;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .result-content {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 40px;
+            text-align: center;
+            max-width: 500px;
+            width: 100%;
+            animation: slideUp 0.4s ease;
+        }
+
+        .result-content h2 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+        }
+
+        .result-content.win h2 {
+            color: #38a169;
+        }
+
+        .result-content.lose h2 {
+            color: #e53e3e;
+        }
+
+        .result-character {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .result-character img {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .result-character h3 {
+            font-size: 1.5rem;
+            color: var(--dark-text);
+        }
+
+        .result-stats {
+            background: #f7fafc;
+            border-radius: var(--border-radius-sm);
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .result-stats p {
+            margin: 10px 0;
+            font-size: 1.1rem;
+        }
+
+        .result-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .result-buttons button {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 25px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .rematch-btn {
+            background: var(--primary-gradient);
+            color: white;
+        }
+
+        .rematch-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .home-btn {
+            background: #718096;
+            color: white;
+        }
+
+        .home-btn:hover {
+            background: #4a5568;
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(113, 128, 150, 0.3);
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 992px) {
+            .battle-layout {
+                grid-template-columns: 1fr;
+            }
+            
+            .actions-grid-v2 {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .ai-battle-container {
+                padding: 15px;
+            }
+            
+            .battle-header h1 {
+                font-size: 2rem;
+            }
+            
+            .character-name {
+                font-size: 1.5rem;
+            }
+            
+            .actions-grid-v2 {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            
+            .battle-controls {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .control-btn {
+                width: 100%;
+                max-width: 300px;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .actions-grid-v2 {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .stats-display {
+                grid-template-columns: 1fr;
+            }
+            
+            .character-display {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .character-tags {
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <div class="logo">
+                <img src="images/logo.png" alt="BKS Logo">
+                <h1>BKS官方网站 - 1V1人机对战</h1>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container ai-battle-container">
+        <!-- 角色选择阶段 -->
+        <div id="character-selection" class="character-selection">
+            <div class="selection-header">
+                <h2>选择你的角色</h2>
+                <p>系统将随机抽取3个角色供你选择，AI对手的角色也是随机的</p>
+            </div>
+            
+            <div class="selection-grid" id="selection-grid">
+                <!-- 角色选项将动态生成 -->
+            </div>
+            
+            <button id="start-battle-btn" class="start-battle-btn" disabled>
+                <i class="fas fa-play"></i> 开始对战
+            </button>
+        </div>
+
+        <!-- 对战界面 -->
+        <div id="battle-interface" class="hidden">
+            <div class="battle-header">
+                <h1>1V1人机对战</h1>
+                <p>与AI对手一决高下</p>
+            </div>
+
+            <div class="battle-layout">
+                <!-- 玩家区域 -->
+                <div class="player-area">
+                    <div class="turn-highlight" id="player-turn-indicator">你的回合</div>
+                    
+                    <div class="character-display">
+                        <img id="player-avatar" src="" alt="玩家角色" class="character-avatar">
+                        <div class="character-info">
+                            <div class="character-name" id="player-name">玩家</div>
+                            <div class="character-tags" id="player-tags">
+                                <!-- 角色标签动态生成 -->
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="stats-display">
+                        <div class="stat-box hp-stat">
+                            <div class="stat-header">
+                                <i class="fas fa-heart"></i>
+                                <h4>生命值</h4>
+                            </div>
+                            <div class="stat-value" id="player-hp">3/3</div>
+                            <div class="stat-bar hp-bar">
+                                <div class="fill" id="player-hp-fill" style="width: 100%;"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="stat-box energy-stat">
+                            <div class="stat-header">
+                                <i class="fas fa-bolt"></i>
+                                <h4>能量</h4>
+                            </div>
+                            <div class="stat-value" id="player-energy">2/10</div>
+                            <div class="stat-bar energy-bar">
+                                <div class="fill" id="player-energy-fill" style="width: 20%;"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="action-selection">
+                        <h3><i class="fas fa-gamepad"></i> 你的行动选择</h3>
+                        <div class="selected-action-display">
+                            <span id="player-selected-action" class="waiting-selection">等待选择行动...</span>
+                        </div>
+                        <div class="actions-grid-v2" id="player-actions-grid">
+                            <!-- 玩家行动按钮动态生成 -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- AI区域 -->
+                <div class="ai-area">
+                    <div class="turn-highlight hidden" id="ai-turn-indicator">AI回合</div>
+                    
+                    <div class="character-display">
+                        <img id="ai-avatar" src="" alt="AI角色" class="character-avatar">
+                        <div class="character-info">
+                            <div class="character-name" id="ai-name">AI对手</div>
+                            <div class="character-tags" id="ai-tags">
+                                <!-- AI角色标签动态生成 -->
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="stats-display">
+                        <div class="stat-box hp-stat">
+                            <div class="stat-header">
+                                <i class="fas fa-heart"></i>
+                                <h4>生命值</h4>
+                            </div>
+                            <div class="stat-value" id="ai-hp">3/3</div>
+                            <div class="stat-bar hp-bar">
+                                <div class="fill" id="ai-hp-fill" style="width: 100%;"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="stat-box energy-stat">
+                            <div class="stat-header">
+                                <i class="fas fa-bolt"></i>
+                                <h4>能量</h4>
+                            </div>
+                            <div class="stat-value" id="ai-energy">2/10</div>
+                            <div class="stat-bar energy-bar">
+                                <div class="fill" id="ai-energy-fill" style="width: 20%;"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="action-selection">
+                        <h3><i class="fas fa-robot"></i> AI的行动选择</h3>
+                        <div class="selected-action-display">
+                            <span id="ai-selected-action" class="waiting-selection">AI正在思考...</span>
+                        </div>
+                        <div class="actions-grid-v2" id="ai-actions-grid">
+                            <!-- AI行动按钮（只读）动态生成 -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 回合信息区域 -->
+                <div class="battle-center">
+                    <div class="current-turn-info">
+                        <h2 id="current-turn-title">第1回合</h2>
+                        <p id="current-turn-description">随机决定谁可以使用攻击行动...</p>
+                    </div>
+                    
+                    <div class="turn-rules">
+                        <h4><i class="fas fa-info-circle"></i> 回合规则说明</h4>
+                        <p><strong>当前回合拥有者：</strong><span id="turn-owner">随机</span></p>
+                        <p><strong>回合拥有者：</strong>可以选择全部10种行动（包括攻击行动1-3）</p>
+                        <p><strong>非回合拥有者：</strong>只能选择除攻击行动（1-3）以外的行动</p>
+                        <p><strong>行动结算：</strong>双方同时选择行动后，同时结算伤害和效果</p>
+                        <p><strong>防御机制：</strong>防御点数只在当前回合有效，不延续到下一回合</p>
+                    </div>
+                    
+                    <div class="battle-controls">
+                        <button id="confirm-action" class="control-btn confirm-btn" disabled>
+                            <i class="fas fa-check"></i> 确认行动
+                        </button>
+                        <button id="restart-battle" class="control-btn restart-btn">
+                            <i class="fas fa-redo"></i> 重新开始
+                        </button>
+                        <a href="index.html" class="control-btn back-btn">
+                            <i class="fas fa-home"></i> 返回首页
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 战斗日志 -->
+            <div class="battle-log">
+                <h3>战斗日志</h3>
+                <div class="log-messages" id="log-messages">
+                    <!-- 日志消息将动态添加 -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 结果弹窗 -->
+    <div id="result-modal" class="result-modal">
+        <div class="result-content" id="result-content">
+            <!-- 结果内容将动态生成 -->
+        </div>
+    </div>
+
+    <footer>
+        <p>© 2024 BKS官方网站 版权所有</p>
+    </footer>
+
+    <script src="script.js"></script>
+    <script src="ai_battle_v2.js"></script>
+</body>
+</html>
